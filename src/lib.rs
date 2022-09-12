@@ -44,7 +44,7 @@ pub struct CheckList {
 impl CheckList{
   pub fn display(& self, level : usize){
     for item in &self.items {
-      &item.display(level + 1);
+      item.display(level + 1);
     }
   }
 }
@@ -65,7 +65,7 @@ impl ListItem{
     let indent = std::iter::repeat("  ").take(level).collect::<String>();
     print!("\n{}- [ ] ",indent);
     for segment in &self.content{
-      &segment.display(level);
+      segment.display(level);
     }
   }
 }
@@ -114,7 +114,7 @@ impl Node{
       println!("   :END:");
     }
     for segment in &self.content{
-      &segment.display(0);
+      segment.display(0);
       println!("")
     }
     for c in &self.children{
