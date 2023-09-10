@@ -1,6 +1,8 @@
 use chrono::prelude::*;
 use chrono::DateTime;
 use std::collections::HashMap;
+use toml::Value;
+use toml::Table;
 
 #[derive(Debug)]
 pub enum Text{
@@ -185,4 +187,27 @@ impl NodeBuilder {
       content : Vec::new()
     }
   }
+}
+
+pub fn from_table(table: &Table, default_title: &String, dt: Option<DateTime<Utc>>) -> Node {
+  let children : Vec<Node> = table.iter()
+    .filter_map( move |(key,val)| {
+      if let Value::Table(t) = val{
+        Some(vec![from_table(t,key,dt)])
+      }else{
+        None
+      }
+    }
+  ).flatten().collect();
+  let title = if let Some(Value::String(candidate)) = table.get("title"){
+    candidate
+  }else{
+    default_title
+  };
+  let mut result : NodeBuilder = NodeBuilder::new(title)
+    .add_children(children);
+  if let Some(Value::String(category)) = table.get("category"){
+    result = result.add_property("CATEGORY",category);
+  }
+  result.build()
 }
